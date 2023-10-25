@@ -28,6 +28,11 @@ const connect = () => {
     })
 }
 
+//Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 app.use(function (req, res, next) {
     // res.header('Access-Control-Allow-Origin', 'https://fitness-app-client-pi.vercel.app');
     res.header('Access-Control-Allow-Origin', '*');
