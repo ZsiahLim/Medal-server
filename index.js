@@ -83,15 +83,22 @@ const getUser = (userId) => users.find(user => user.userId === userId)
 const io = new Server(server, {
     cors: {
         origin: '*',
+        methods: ["GET", "POST"],
         // origin: 'http://localhost:5173',
         // credentials: true
     }
 })
 io.on("connection", (socket) => {
+    console.log('connect');
     io.emit('welcome', 'hello this is the fitness app of leon')
     // connect
     socket.on("addUser", userId => {
         addUser(userId, socket.id);
+        io.emit("getUsers", users)
+        console.log("now users", users);
+    })
+    socket.on("removeUser", userId => {
+        removeUser(userId, socket.id);
         io.emit("getUsers", users)
         console.log("now users", users);
     })
