@@ -40,6 +40,22 @@ export const getMessage = async (req, res, next) => {
         next(err)
     }
 }
+export const getMessagesForMobile = async (req, res, next) => {
+    try {
+        await Message.updateMany({
+            conversationId: req.params.conversationId,
+            receiver: req.user.id
+        }, {
+            $set: { readed: true }
+        })
+        const messages = await Message.find({
+            conversationId: req.params.conversationId
+        }).sort({ createdAt: -1 })
+        res.status(200).json(messages)
+    } catch (err) {
+        next(err)
+    }
+}
 
 export const getUnreadedMessages = async (req, res, next) => {
     const userID = req.user.id
