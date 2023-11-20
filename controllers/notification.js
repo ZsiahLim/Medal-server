@@ -3,7 +3,6 @@ import Notification from '../models/Notification.js'
 import User from '../models/Users.js'
 
 export const createNotification = async (req, res, next) => {
-    console.log("noti", req.body);
     const newNotification = new Notification({ ...req.body })
     try {
         const saveNotification = await newNotification.save()

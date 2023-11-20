@@ -181,11 +181,23 @@ export const cancerlikeComment = async (req, res, next) => {
 
 
 export const createReport = async (req, res, next) => {
-    const userID = req.user.id
-    const newReport = new Report({ userID, ...req.body })
     try {
+        const userID = req.user.id
+        const newReport = new Report({ userID, ...req.body })
         const savedReport = await newReport.save()
         res.status(200).json(savedReport)
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const updatePrefer = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const { evaluationAnswer } = req.body
+        console.log(evaluationAnswer);
+        const updatedUser = await User.findByIdAndUpdate(userID, { personalPrefer: evaluationAnswer })
+        res.status(200).json(updatedUser)
     } catch (err) {
         next(err)
     }
