@@ -1,10 +1,12 @@
 import express from 'express'
 import { verifyToken } from '../verifyToken.js'
 import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport, updatePrefer } from '../controllers/user.js'
+import { setNotificationTab } from '../controllers/notificationTab.js'
 const router = express.Router()
 
 // add the contacts
 router.put('/add', verifyToken, addContact)
+
 
 router.put('/:id', verifyToken, updateUser)
 
@@ -45,6 +47,9 @@ router.put('/cancellikecomment/:commentID', verifyToken, cancerlikeComment)
 router.post('/report', verifyToken, createReport)
 
 router.post('/prefer', verifyToken, updatePrefer)
+
+router.put('/notificationtab/set', verifyToken, setNotificationTab)
+
 
 
 export default router
