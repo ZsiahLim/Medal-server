@@ -134,7 +134,12 @@ export const deleteComment = async (req, res, next) => {
 export const reply = async (req, res, next) => {
     try {
         const targetID = req.params.id
-
+        console.log(req.params);
+        const { content, report } = req.body
+        await Report.findByIdAndUpdate(report._id, { status: 'done', adminResponse: `Reply to reporter: ${content}` })
+        const NotificationForReporter = new Notification({ userID: report.userID, type: 'reportfeedback', title: `${content}`, targetID: report.targetID, targetType: report.type })
+        await NotificationForReporter.save()
+        res.status(200).json({ success: true })
     } catch (err) {
         next(err)
     }

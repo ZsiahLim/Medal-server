@@ -71,7 +71,30 @@ const UserSchema = new Schema({
     },
     muteDate: {
         type: Date,
+    },
+    personalPrefer: {
+        type: Object,
+        default: {}
+    },
+    practicedTutorials: {
+        type: [String],
+        default: []
+    },
+    favoriteTutorials: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'tutorials'
+        }],
+        default: []
+    },
+    sessions: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'sessions'
+        }],
+        default: []
     }
+
 }, { timestamps: true })
 
 const UserModel = model("users", UserSchema)

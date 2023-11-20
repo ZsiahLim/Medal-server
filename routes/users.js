@@ -1,6 +1,6 @@
 import express from 'express'
 import { verifyToken } from '../verifyToken.js'
-import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport } from '../controllers/user.js'
+import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport, updatePrefer } from '../controllers/user.js'
 const router = express.Router()
 
 // add the contacts
@@ -43,6 +43,8 @@ router.put('/cancellikecomment/:commentID', verifyToken, cancerlikeComment)
 
 // router.post('/', createBlog)
 router.post('/report', verifyToken, createReport)
+
+router.post('/prefer', verifyToken, updatePrefer)
 
 
 export default router
