@@ -93,6 +93,12 @@ const UserSchema = new Schema({
             ref: 'sessions'
         }],
         default: []
+    },
+    notificationTab: {
+        type: {
+            type: Schema.Types.ObjectId,
+            ref: 'notificationTab'
+        },
     }
 
 }, { timestamps: true })
