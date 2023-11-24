@@ -1,6 +1,5 @@
 import { createError } from "../error.js"
 import Notification from '../models/Notification.js'
-import User from '../models/Users.js'
 
 export const createNotification = async (req, res, next) => {
     const newNotification = new Notification({ ...req.body })
@@ -14,13 +13,14 @@ export const createNotification = async (req, res, next) => {
 
 export const removeNotification = async (req, res, next) => {
     try {
-        const Notification = await Notification.findById(req.params.id)
-        if (!Notification) {
+        const notification = await Notification.findById(req.params.id)
+        if (!notification) {
             return next(createError(404, "not found"))
         }
-        if (req.user.id === Notification.userID) {
+        if (req.user.id === notification.userID) {
+            console.log("daozhele");
             await Notification.findByIdAndDelete(req.params.id)
-            res.status(200).json('remove successfully')
+            res.status(200).json({ success: true })
         } else {
             return next(createError(403, "can only delete your Notification"))
         }

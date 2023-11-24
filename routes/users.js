@@ -1,12 +1,14 @@
 import express from 'express'
 import { verifyToken } from '../verifyToken.js'
-import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport, updatePrefer } from '../controllers/user.js'
+import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport, updatePrefer, updateWeightTarget, participateTutorial } from '../controllers/user.js'
 import { setNotificationTab } from '../controllers/notificationTab.js'
 const router = express.Router()
 
 // add the contacts
 router.put('/add', verifyToken, addContact)
 
+router.put('/updateWeightTarget', verifyToken, updateWeightTarget)
+router.put('/participateTutorial/:id', verifyToken, participateTutorial)
 
 router.put('/:id', verifyToken, updateUser)
 
@@ -14,7 +16,6 @@ router.delete('/:id', verifyToken, deleteUser)
 
 // get a user
 router.get('/find/:id', getUser)
-
 
 // remove the contacts
 router.put('/remove/:id', verifyToken, removeContact)

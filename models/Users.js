@@ -77,7 +77,10 @@ const UserSchema = new Schema({
         default: {}
     },
     practicedTutorials: {
-        type: [String],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'tutorials'
+        }],
         default: []
     },
     favoriteTutorials: {
@@ -94,11 +97,22 @@ const UserSchema = new Schema({
         }],
         default: []
     },
+    // customize the notification tabs
     notificationTab: {
         type: {
             type: Schema.Types.ObjectId,
             ref: 'notificationTab'
         },
+    },
+    // boday measurements
+    measurements: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'measurements'
+        }]
+    },
+    weightTarget: {
+        type: Number,
     }
 
 }, { timestamps: true })

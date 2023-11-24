@@ -14,6 +14,7 @@ import notificationRoutes from './routes/notification.js'
 import sessionRoutes from './routes/session.js'
 import messageRoutes from './routes/messages.js'
 import musicRoutes from './routes/music.js'
+import measurementRoutes from './routes/measurements.js'
 import cookieParser from 'cookie-parser'
 import { Server } from 'socket.io'
 import cors from 'cors'
@@ -52,6 +53,7 @@ app.use('/api/admin', adminRoutes)
 app.use('/api/notification', notificationRoutes)
 app.use('/api/session', sessionRoutes)
 app.use('/api/music', musicRoutes)
+app.use('/api/measurement', measurementRoutes)
 
 app.use((err, req, res, next) => {
     const status = err.status || 500
