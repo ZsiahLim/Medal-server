@@ -3,6 +3,7 @@ import User from '../models/Users.js'
 import Blog from '../models/Blog.js'
 import Comment from '../models/Comment.js'
 import Report from '../models/Report.js'
+import Tutorial from "../models/Tutorial.js"
 // update user
 export const updateUser = async (req, res, next) => {
     if (req.params.id === req.user.id) {
@@ -16,6 +17,34 @@ export const updateUser = async (req, res, next) => {
         }
     } else {
         return next(createError(403, "Can only update your account"))
+    }
+}
+export const updateWeightTarget = async (req, res, next) => {
+    console.log('Doale');
+    try {
+        const userID = req.user.id
+        const updateUser = await User.findByIdAndUpdate(userID, {
+            $set: { weightTarget: req.body.weightTarget }
+        }, { new: true })
+        res.status(200).json(updateUser)
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const participateTutorial = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const tutorialID = req.params.id
+        const updateUser = await User.findByIdAndUpdate(userID, {
+            $addToSet: { practicedTutorials: tutorialID }
+        }, { new: true })
+        const updatedTutorial = await Tutorial.findByIdAndUpdate(tutorialID, {
+            $addToSet: { users: userID }
+        })
+        res.status(200).json({ user: updateUser, updatedTutorial })
+    } catch (err) {
+        next(err)
     }
 }
 

@@ -19,6 +19,25 @@ export const createSession = async (req, res, next) => {
     }
 }
 
+export const deleteSession = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const sessionID = req.params.id
+        console.log("sessionID", sessionID);
+        const session = await Session.findByIdAndDelete(sessionID)
+        console.log("session", session);
+        const user = await User.findByIdAndUpdate(userID, { $pull: { sessions: session._id } });
+        const updatedSessions = await Session.find({ user: userID }).populate('tutorial')
+        if (!user) {
+            return next(createError(404, "not found"))
+        } else {
+            res.status(200).json({ user, updatedSessions })
+        }
+    } catch (err) {
+        next(err)
+    }
+}
+
 export const getSessions = async (req, res, next) => {
     try {
         const userID = req.user.id

@@ -11,7 +11,7 @@ router.post('/', createNotification)
 router.put('/:id', updateNotification)
 
 // router.delete('/:id', removeNotification)
-router.delete('/:id', removeNotification)
+router.delete('/:id', verifyToken, removeNotification)
 
 router.get('/find/:id', getNotification)
 
