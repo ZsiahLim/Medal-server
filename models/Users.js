@@ -111,9 +111,27 @@ const UserSchema = new Schema({
             ref: 'measurements'
         }]
     },
+    records: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'records'
+        }]
+    },
     weightTarget: {
         type: Number,
-    }
+    },
+    stepTarget: {
+        type: Number,
+    },
+    distanceTarget: {
+        type: Number,
+    },
+    calorieTarget: {
+        type: Number,
+    },
+    durationTarget: {
+        type: Number,
+    },
 
 }, { timestamps: true })
 

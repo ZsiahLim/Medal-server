@@ -20,11 +20,55 @@ export const updateUser = async (req, res, next) => {
     }
 }
 export const updateWeightTarget = async (req, res, next) => {
-    console.log('Doale');
     try {
         const userID = req.user.id
         const updateUser = await User.findByIdAndUpdate(userID, {
             $set: { weightTarget: req.body.weightTarget }
+        }, { new: true })
+        res.status(200).json(updateUser)
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const updateStepTarget = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const updateUser = await User.findByIdAndUpdate(userID, {
+            $set: { stepTarget: req.body.stepTarget }
+        }, { new: true })
+        res.status(200).json(updateUser)
+    } catch (err) {
+        next(err)
+    }
+}
+export const updateDistanceTarget = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const updateUser = await User.findByIdAndUpdate(userID, {
+            $set: { distanceTarget: req.body.distanceTarget }
+        }, { new: true })
+        res.status(200).json(updateUser)
+    } catch (err) {
+        next(err)
+    }
+}
+export const updateCalorieTarget = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const updateUser = await User.findByIdAndUpdate(userID, {
+            $set: { calorieTarget: req.body.calorieTarget }
+        }, { new: true })
+        res.status(200).json(updateUser)
+    } catch (err) {
+        next(err)
+    }
+}
+export const updateDurationTarget = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const updateUser = await User.findByIdAndUpdate(userID, {
+            $set: { durationTarget: req.body.durationTarget }
         }, { new: true })
         res.status(200).json(updateUser)
     } catch (err) {

@@ -1,6 +1,6 @@
 import express from 'express'
 import { verifyToken } from '../verifyToken.js'
-import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport, updatePrefer, updateWeightTarget, participateTutorial } from '../controllers/user.js'
+import { cancerlikeBlog, addContact, deleteUser, dislikeBlog, favoriteBlog, cancerfavoriteBlog, getUser, likeBlog, removeContact, updateUser, likeComment, cancerlikeComment, createReport, updatePrefer, updateWeightTarget, participateTutorial, updateStepTarget, updateDistanceTarget, updateCalorieTarget, updateDurationTarget } from '../controllers/user.js'
 import { setNotificationTab } from '../controllers/notificationTab.js'
 const router = express.Router()
 
@@ -8,6 +8,10 @@ const router = express.Router()
 router.put('/add', verifyToken, addContact)
 
 router.put('/updateWeightTarget', verifyToken, updateWeightTarget)
+router.put('/updateStepTarget', verifyToken, updateStepTarget)
+router.put('/updateDistanceTarget', verifyToken, updateDistanceTarget)
+router.put('/updateCalorieTarget', verifyToken, updateCalorieTarget)
+router.put('/updateDurationTarget', verifyToken, updateDurationTarget)
 router.put('/participateTutorial/:id', verifyToken, participateTutorial)
 
 router.put('/:id', verifyToken, updateUser)

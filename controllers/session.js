@@ -35,10 +35,22 @@ export const finishSession = async (req, res, next) => {
         }).exec();
         console.log(sessionsToday);
         let session;
-        if (sessionsToday.length > 0) {
-            const specificSession = sessionsToday[0]._id
-            console.log("specificSession", specificSession);
-            session = await Session.findByIdAndUpdate(specificSession, { $set: { completed: true } })
+        if (sessionsToday.length === 1) {
+            const specificSession = sessionsToday[0]
+            if (specificSession.completed === true) {
+                const newSession = new Session(
+                    {
+                        user: userID,
+                        date: new Date(),
+                        completed: true,
+                        tutorial: tutorialID,
+                        ...req.body
+                    }
+                )
+                session = await newSession.save();
+            } else {
+                session = await Session.findByIdAndUpdate(specificSession._id, { $set: { completed: true } })
+            }
         } else {
             const newSession = new Session(
                 {
