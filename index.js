@@ -71,7 +71,6 @@ app.use((err, req, res, next) => {
         message: message
     })
 })
-
 const server = app.listen(port, () => {
     connect()
     console.log("Connect to server!");

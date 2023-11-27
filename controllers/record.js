@@ -6,14 +6,25 @@ export const uploadRecord = async (req, res, next) => {
     try {
         const userID = req.user.id
         const { date } = req.body;
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
-        const updatedRecord = await Record.findOneAndUpdate({ user: userID, date: { $gte: startOfDay, $lte: endOfDay } }, req.body, { new: true, upsert: true });
+
+        const updatedRecord = await Record.findOneAndUpdate(
+            { user: userID, date },
+            req.body,
+            { new: true, upsert: true }
+        );
+
         const user = await User.findByIdAndUpdate(userID, { $addToSet: { records: updatedRecord._id } });
-        // }
-        const updatedRecords = await Record.find({ user: userID })
+        const updatedRecords = await Record.find({ user: userID });
+
+
+        // const startOfDay = new Date(date);
+        // startOfDay.setHours(0, 0, 0, 0);
+        // const endOfDay = new Date(date);
+        // endOfDay.setHours(23, 59, 59, 999);
+        // const updatedRecord = await Record.findOneAndUpdate({ user: userID, date: { $gte: startOfDay, $lte: endOfDay } }, req.body, { new: true, upsert: true });
+        // const user = await User.findByIdAndUpdate(userID, { $addToSet: { records: updatedRecord._id } });
+        // // }
+        // const updatedRecords = await Record.find({ user: userID })
         res.status(200).json({ user, updatedRecords })
     } catch (err) {
         console.log("err", err);
