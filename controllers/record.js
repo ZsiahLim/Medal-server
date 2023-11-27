@@ -14,7 +14,7 @@ export const uploadRecord = async (req, res, next) => {
         );
 
         const user = await User.findByIdAndUpdate(userID, { $addToSet: { records: updatedRecord._id } });
-        const updatedRecords = await Record.find({ user: userID }).sort({ date: 1 });
+        const updatedRecords = await Record.find({ user: userID }).sort({ date: -1 });
         // const startOfDay = new Date(date);
         // startOfDay.setHours(0, 0, 0, 0);
         // const endOfDay = new Date(date);
