@@ -34,7 +34,6 @@ const SessionSchema = new Schema({
     step: {
         type: Number,
     }
-
 }, { timestamps: true })
 
 const SessionModel = model("sessions", SessionSchema)
