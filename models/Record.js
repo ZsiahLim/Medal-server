@@ -20,7 +20,7 @@ const RecordSchema = new Schema({
         required: true,
     },
     distance: {
-        type: Number,//in km
+        type: Number,//in m
         required: true
     },
     tutorialCalorieConsumption: {
