@@ -129,7 +129,7 @@ export const search = async (req, res, next) => {
 export const getMyBlog = async (req, res, next) => {
     try {
         const userID = req.user.id
-        const userBlogs = await Blog.find({ userID, deleted: false })
+        const userBlogs = await Blog.find({ userID })
         res.status(200).json(userBlogs)
     } catch (err) {
         next(err)

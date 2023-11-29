@@ -66,8 +66,9 @@ export const getTutorial = async (req, res, next) => {
 }
 export const getSpecificTypeTutorials = async (req, res, next) => {
     try {
-        const { type } = req.body
+        const { type } = req.query
         const tutorials = await Tutorial.find({ type })
+        console.log("tutorials", tutorials);
         if (tutorials.length === 0) {
             res.status(200).json([])
         } else {
