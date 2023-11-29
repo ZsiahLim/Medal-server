@@ -53,15 +53,16 @@ export const addTutorialToFavor = async (req, res, next) => {
 }
 
 export const getTutorial = async (req, res, next) => {
-    try {
-        const tutorial = await Tutorial.findById(req.params.id)
+    await Tutorial.findById(req.params.id).then(tutorial => {
+        console.log(tutorial);
         if (!tutorial) {
             return next(createError(404, "not found"))
+        } else {
+            res.status(200).json(tutorial)
         }
-        res.status(200).json(tutorial)
-    } catch (err) {
+    }).catch(err => {
         next(err)
-    }
+    })
 }
 export const getSpecificTypeTutorials = async (req, res, next) => {
     try {
