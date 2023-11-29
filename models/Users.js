@@ -48,10 +48,18 @@ const UserSchema = new Schema({
         type: [String],
     },
     likeBlogs: {
-        type: [String],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'blogs'
+        }],
+        default: []
     },
     favoriteBlogs: {
-        type: [String],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'blogs'
+        }],
+        default: []
     },
     competitions: {
         type: [String],

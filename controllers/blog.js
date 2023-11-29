@@ -54,15 +54,16 @@ export const updateBlog = async (req, res, next) => {
 }
 
 export const getBlog = async (req, res, next) => {
-    try {
-        const blog = await Blog.findById(req.params.id)
+    await Blog.findById(req.params.id).then(blog => {
+        console.log(blog);
         if (!blog) {
             return next(createError(404, "not found"))
+        } else {
+            res.status(200).json(blog)
         }
-        res.status(200).json(blog)
-    } catch (err) {
+    }).catch(err => {
         next(err)
-    }
+    })
 }
 
 export const random = async (req, res, next) => {
