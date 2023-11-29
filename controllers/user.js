@@ -4,6 +4,7 @@ import Blog from '../models/Blog.js'
 import Comment from '../models/Comment.js'
 import Report from '../models/Report.js'
 import Tutorial from "../models/Tutorial.js"
+import mongoose from "mongoose"
 // update user
 export const updateUser = async (req, res, next) => {
     if (req.params.id === req.user.id) {
@@ -110,6 +111,7 @@ export const deleteUser = async (req, res, next) => {
 export const getUser = async (req, res, next) => {
     try {
         const user = await User.findById(req.params.id)
+        console.log(user);
         res.status(200).json(user)
     } catch (err) {
         next(err)
@@ -146,6 +148,29 @@ export const addContact = async (req, res, next) => {
                 })
                 const newUser = await User.findById(req.user.id)
                 res.status(200).json(newUser)
+            }
+        } else {
+            next(createError(403, "This user does not exist"))
+        }
+    } catch (err) {
+        next(err)
+    }
+}
+export const addContactByID = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id)
+        const contactID = req.params.contactID
+        const contact = await User.findById(contactID)
+        if (contact) {
+            const contacts = user.contactsUsers
+            const alreadyExists = contacts.includes(contact)
+            if (alreadyExists || contact.name === user.name) {
+                next(createError(403, "Cannot add existed user or yourself"))
+            } else {
+                const updatedUser = await User.findByIdAndUpdate(req.user.id, {
+                    $addToSet: { contactsUsers: contact._id }
+                }, { new: true })
+                res.status(200).json(updatedUser)
             }
         } else {
             next(createError(403, "This user does not exist"))
@@ -279,3 +304,32 @@ export const updatePrefer = async (req, res, next) => {
         next(err)
     }
 }
+
+export const fuzzySearchUser = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        let searchText = req.query.searchText
+        const searchRegex = new RegExp(searchText, "i")
+        let queryConditions = [
+            { name: { $regex: searchRegex } },
+            { email: { $regex: searchRegex } },
+        ];
+
+        // Check if searchText is a valid ObjectId
+        if (searchText.match(/^[0-9a-fA-F]{24}$/)) {
+            queryConditions.push({ _id: new mongoose.Types.ObjectId(searchText) });
+        }
+        const updatedUser = await User.find({
+            $and: [
+                { $or: queryConditions, },
+                { _id: { $ne: userID } }
+            ]
+
+        })
+        res.status(200).json(updatedUser)
+    } catch (err) {
+        console.log(err);
+        next(err)
+    }
+}
+

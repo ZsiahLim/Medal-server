@@ -45,7 +45,18 @@ const UserSchema = new Schema({
         type: String,
     },
     contactsUsers: {
-        type: [String],
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'users'
+        }],
+        default: []
+    },
+    blogs: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'blogs'
+        }],
+        default: []
     },
     likeBlogs: {
         type: [{
@@ -123,6 +134,12 @@ const UserSchema = new Schema({
         type: [{
             type: Schema.Types.ObjectId,
             ref: 'records'
+        }]
+    },
+    conversations: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'conversations'
         }]
     },
     weightTarget: {
