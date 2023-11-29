@@ -170,10 +170,12 @@ export const likeBlog = async (req, res, next) => {
     const UserID = req.user.id
     const BlogID = req.params.blogID
     try {
-        const user = await User.findByIdAndUpdate(UserID, { $addToSet: { likeBlogs: BlogID } })
+        const user = await User.findByIdAndUpdate(UserID, { $addToSet: { likeBlogs: BlogID } }, { new: true })
+        console.log("user.likeBlogs", user.likeBlogs);
         const blog = await Blog.findByIdAndUpdate(BlogID, { $addToSet: { likesUsers: UserID }, $pull: { dislikeUsers: UserID } })
         res.status(200).json(user)
     } catch (err) {
+        console.log("err", err);
         next(err)
     }
 }
@@ -182,11 +184,14 @@ export const likeBlog = async (req, res, next) => {
 export const cancerlikeBlog = async (req, res, next) => {
     const UserID = req.user.id
     const BlogID = req.params.blogID
+    console.log("daozhele", BlogID);
     try {
-        const user = await User.findByIdAndUpdate(UserID, { $pull: { likeBlogs: BlogID } })
+        const user = await User.findByIdAndUpdate(UserID, { $pull: { likeBlogs: BlogID } }, { new: true })
+        console.log("user.likeBlogs", user.likeBlogs);
         await Blog.findByIdAndUpdate(BlogID, { $pull: { likesUsers: UserID } })
         res.status(200).json(user)
     } catch (err) {
+        console.log("err", err);
         next(err)
     }
 }
@@ -195,7 +200,7 @@ export const favoriteBlog = async (req, res, next) => {
     const UserID = req.user.id
     const BlogID = req.params.blogID
     try {
-        const user = await User.findByIdAndUpdate(UserID, { $addToSet: { favoriteBlogs: BlogID } })
+        const user = await User.findByIdAndUpdate(UserID, { $addToSet: { favoriteBlogs: BlogID } }, { new: true })
         await Blog.findByIdAndUpdate(BlogID, { $addToSet: { favoriteUsers: UserID }, $pull: { dislikeUsers: UserID } })
         res.status(200).json(user)
     } catch (err) {
@@ -207,7 +212,7 @@ export const cancerfavoriteBlog = async (req, res, next) => {
     const UserID = req.user.id
     const BlogID = req.params.blogID
     try {
-        const user = await User.findByIdAndUpdate(UserID, { $pull: { favoriteBlogs: BlogID } })
+        const user = await User.findByIdAndUpdate(UserID, { $pull: { favoriteBlogs: BlogID } }, { new: true })
         await Blog.findByIdAndUpdate(BlogID, { $pull: { favoriteUsers: UserID } })
         res.status(200).json(user)
     } catch (err) {
