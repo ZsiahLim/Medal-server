@@ -1,7 +1,8 @@
 import { Schema, model } from "mongoose"
 const BlogSchema = new Schema({
     userID: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'users',
         required: true,
     },
     status: {

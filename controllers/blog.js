@@ -3,10 +3,11 @@ import Blog from '../models/Blog.js'
 import User from '../models/Users.js'
 
 export const createBlog = async (req, res, next) => {
-    const newBlog = new Blog({ userID: req.user.id, ...req.body })
     try {
-        const saveBlog = await newBlog.save()
-        res.status(200).json(saveBlog)
+        const newBlog = new Blog({ userID: req.user.id, ...req.body })
+        const blog = await newBlog.save()
+        const user = await User.findByIdAndUpdate(req.user.id, { $addToSet: { blogs: blog._id } })
+        res.status(200).json({ blog, user })
     } catch (err) {
         next(err)
     }
@@ -14,23 +15,9 @@ export const createBlog = async (req, res, next) => {
 
 export const removeBlog = async (req, res, next) => {
     try {
-        // const blog = await Blog.findById(req.params.id)
-        // if (!blog) {
-        //     return next(createError(404, "not found"))
-        // }
-        // if (req.user.id === blog.userID) {
-        //     await Blog.findByIdAndDelete(req.params.id)
-        //     res.status(200).json('remove successfully')
-        // } else {
-        //     return next(createError(403, "can only delete your blog"))
-        // }
-        const blog = await Blog.findById(req.params.id)
-        if (!blog) {
-            return next(createError(404, "not found"))
-        }
-        const updatedBlog = await Blog.updateOne({ _id: req.params.id }, { $set: { deleted: true } })
-        console.log("updateBlog", updatedBlog);
-        res.status(200).json(updatedBlog)
+        await Blog.findByIdAndDelete(req.params.id)
+        const user = await User.findByIdAndUpdate(req.user.id, { $pull: { blogs: req.params.id } })
+        res.status(200).json(user)
     } catch (err) {
         next(err)
     }
@@ -38,16 +25,9 @@ export const removeBlog = async (req, res, next) => {
 
 export const updateBlog = async (req, res, next) => {
     try {
-        const blog = await Blog.findById(req.params.id)
-        if (!blog) {
-            return next(createError(404, "not found"))
-        }
-        if (req.user.id === blog.userID) {
-            const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true })
-            res.status(200).json(updatedBlog)
-        } else {
-            return next(createError(403, "can only update your blog"))
-        }
+        const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true }).populate("userID")
+        console.log("updatedBlog", updatedBlog);
+        res.status(200).json(updatedBlog)
     } catch (err) {
         next(err)
     }
@@ -55,7 +35,6 @@ export const updateBlog = async (req, res, next) => {
 
 export const getBlog = async (req, res, next) => {
     await Blog.findById(req.params.id).then(blog => {
-        console.log(blog);
         if (!blog) {
             return next(createError(404, "not found"))
         } else {
@@ -80,12 +59,13 @@ export const random = async (req, res, next) => {
 
 export const mostLike = async (req, res, next) => {
     try {
-        const blogs = await Blog.find({ deleted: false }).sort({ likeNum: -1 })
+        const blogs = await Blog.find().sort({ likeNum: -1 }).limit(20)
         res.status(200).json(blogs)
     } catch (err) {
         next(err)
     }
 }
+
 export const contact = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.id)

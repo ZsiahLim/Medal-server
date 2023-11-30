@@ -5,17 +5,22 @@ import User from '../models/Users.js'
 
 export const newConversation = async (req, res, next) => {
     try {
+        const userID = req.user.id
         const thisMembers = [req.user.id, req.body.receiverId]
-        const conversation = await Conversation.findOne({ members: { $all: thisMembers } })
-        console.log(conversation)
-        if (conversation) {
-            res.status(200).json(conversation)
+        const foundedConversation = await Conversation.findOne({ members: { $all: thisMembers } })
+        console.log(foundedConversation);
+        let user;
+        if (foundedConversation) {
+            user = await User.findByIdAndUpdate(userID, { $addToSet: { conversations: foundedConversation._id } }, { new: true })
+            res.status(200).json({ conversation: foundedConversation, user })
         } else {
             const newConversation = new Conversation({ members: thisMembers })
-            const savedConversation = await newConversation.save()
-            res.status(200).json(savedConversation)
+            const conversation = await newConversation.save()
+            user = await User.findByIdAndUpdate(userID, { $addToSet: { conversations: conversation._id } }, { new: true })
+            res.status(200).json({ conversation, user })
         }
     } catch (err) {
+        console.log(err);
         next(err)
     }
 }
@@ -57,13 +62,17 @@ export const getSpecificConversationUnreadedMessage = async (req, res, next) => 
 
 export const deleteConversation = async (req, res, next) => {
     try {
+        const userID = req.user.id
         const conversationID = req.params.id
         const messages = await Message.deleteMany({
             conversationId: conversationID
         })
-        console.log('message bei shanchu le', messages);
         await Conversation.findByIdAndDelete(req.params.id)
-        res.status(200).json("Conversation has been deleted successfully")
+        const conversations = await Conversation.find({
+            members: { $in: [userID] }
+        })
+        console.log("conversations", conversations);
+        res.status(200).json(conversations)
     } catch (err) {
         next(err)
     }
