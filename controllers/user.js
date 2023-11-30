@@ -110,7 +110,7 @@ export const deleteUser = async (req, res, next) => {
 // get a user
 export const getUser = async (req, res, next) => {
     try {
-        const user = await User.findById(req.params.id)
+        const user = await User.findById(req.params.id).populate('blogs').populate('records')
         console.log(user);
         res.status(200).json(user)
     } catch (err) {
