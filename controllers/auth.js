@@ -11,16 +11,12 @@ export const signup = async (req, res, next) => {
         const hash = bcrypt.hashSync(reqUser.password, salt)
         const CryptUser = { ...reqUser, password: hash }
         const newUser = new User(CryptUser)
-        // console.log(newUser._id);
         const token = jwt.sign({ id: newUser._id }, process.env.JWT)
         const user = await newUser.save()
         const resData = { user: user._doc, token }
         res.status(200).json(resData)
-        // .set({ 'Access-Control-Allow-Origin': webUrl[0] })
-        // .cookie("access_token", token, {
-        //     httpOnly: true
-        // })
     } catch (err) {
+        console.log(err);
         next(err)
     }
 }
