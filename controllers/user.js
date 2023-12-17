@@ -110,8 +110,7 @@ export const deleteUser = async (req, res, next) => {
 // get a user
 export const getUser = async (req, res, next) => {
     try {
-        const user = await User.findById(req.params.id).populate('blogs').populate('records')
-        console.log(user);
+        const user = await User.findById(req.params.id).populate('blogs').populate('records').populate('measurements').populate('sessions')
         res.status(200).json(user)
     } catch (err) {
         next(err)
@@ -136,7 +135,6 @@ export const addContact = async (req, res, next) => {
             default:
                 break;
         }
-        console.log('contact', contact);
         if (contact) {
             const contacts = user.contactsUsers
             const alreadyExists = contacts.includes(contact)
@@ -196,11 +194,9 @@ export const likeBlog = async (req, res, next) => {
     const BlogID = req.params.blogID
     try {
         const user = await User.findByIdAndUpdate(UserID, { $addToSet: { likeBlogs: BlogID } }, { new: true })
-        console.log("user.likeBlogs", user.likeBlogs);
         const blog = await Blog.findByIdAndUpdate(BlogID, { $addToSet: { likesUsers: UserID }, $pull: { dislikeUsers: UserID } })
         res.status(200).json(user)
     } catch (err) {
-        console.log("err", err);
         next(err)
     }
 }
@@ -209,14 +205,11 @@ export const likeBlog = async (req, res, next) => {
 export const cancerlikeBlog = async (req, res, next) => {
     const UserID = req.user.id
     const BlogID = req.params.blogID
-    console.log("daozhele", BlogID);
     try {
         const user = await User.findByIdAndUpdate(UserID, { $pull: { likeBlogs: BlogID } }, { new: true })
-        console.log("user.likeBlogs", user.likeBlogs);
         await Blog.findByIdAndUpdate(BlogID, { $pull: { likesUsers: UserID } })
         res.status(200).json(user)
     } catch (err) {
-        console.log("err", err);
         next(err)
     }
 }
@@ -297,10 +290,42 @@ export const updatePrefer = async (req, res, next) => {
     try {
         const userID = req.user.id
         const { evaluationAnswer } = req.body
-        console.log(evaluationAnswer);
         const updatedUser = await User.findByIdAndUpdate(userID, { personalPrefer: evaluationAnswer })
+
+        const queryConditions = [];
+
+        // 当evaluationAnswer.goal存在时，添加type条件
+        if (evaluationAnswer?.goal) {
+            queryConditions.push({ type: { $eq: evaluationAnswer.goal } });
+        }
+
+        // 当evaluationAnswer.level存在时，添加level条件
+        if (evaluationAnswer?.level) {
+            queryConditions.push({ level: evaluationAnswer.level });
+        }
+
+        // 当evaluationAnswer.duration存在且其lowRangeValue和higherRangeValue存在时，添加duration条件
+        if (evaluationAnswer?.duration && Object.keys(evaluationAnswer?.duration).length !== 0 && typeof evaluationAnswer.duration.lowRangeValue !== 'undefined' && typeof evaluationAnswer.duration.higherRangeValue !== 'undefined') {
+            queryConditions.push({ duration: { $gte: evaluationAnswer.duration.lowRangeValue, $lte: evaluationAnswer.duration.higherRangeValue } });
+        }
+
+        // 当evaluationAnswer.calorie存在且其lowRangeValue和higherRangeValue存在时，添加calorie条件
+        if (evaluationAnswer?.calorie && Object.keys(evaluationAnswer?.calorie).length !== 0 && typeof evaluationAnswer.calorie.lowRangeValue !== 'undefined' && typeof evaluationAnswer.calorie.higherRangeValue !== 'undefined') {
+            const calorieRangeCondition = {
+                $or: [
+                    { lowerEstimateColorie: { $gte: evaluationAnswer.calorie.lowRangeValue, $lte: evaluationAnswer.calorie.higherRangeValue } },
+                    { higherEstimateColorie: { $gte: evaluationAnswer.calorie.lowRangeValue, $lte: evaluationAnswer.calorie.higherRangeValue } },
+                ]
+            };
+            queryConditions.push(calorieRangeCondition);
+        }
+
+        // 使用$and操作符，只有当queryConditions非空时才添加到查询中
+        const query = queryConditions.length > 0 ? { $and: queryConditions } : {};
+        const fitTututorials = await Tutorial.find(query)
         res.status(200).json(updatedUser)
     } catch (err) {
+        console.log("err", err);
         next(err)
     }
 }
@@ -328,7 +353,6 @@ export const fuzzySearchUser = async (req, res, next) => {
         })
         res.status(200).json(updatedUser)
     } catch (err) {
-        console.log(err);
         next(err)
     }
 }

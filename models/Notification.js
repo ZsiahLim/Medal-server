@@ -5,7 +5,7 @@ const NotificationSchema = new Schema({
     },
     type: {
         type: String
-        // 系统消息， 举报反馈reportfeedback，被举报反馈reportedfeedback，代办
+        // 系统消息， 举报反馈reportfeedback，被举报反馈reportedfeedback，代办 反馈的反馈feedbackFeedback
     },
     title: {
         type: String

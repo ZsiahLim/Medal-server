@@ -19,6 +19,18 @@ export const uploadMeasurement = async (req, res, next) => {
     }
 }
 
+export const updateMeasurement = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const MeasurementID = req.params.id
+        await Measurement.findByIdAndUpdate(MeasurementID, { $set: req.body }, { new: true });
+        const updatedMeasurements = await Measurement.find({ user: userID }).sort({ date: 1 })
+        res.status(200).json(updatedMeasurements)
+    } catch (err) {
+        next(err)
+    }
+}
+
 export const deleteMeasurement = async (req, res, next) => {
     try {
         const userID = req.user.id

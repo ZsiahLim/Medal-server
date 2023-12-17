@@ -54,7 +54,6 @@ export const addTutorialToFavor = async (req, res, next) => {
 
 export const getTutorial = async (req, res, next) => {
     await Tutorial.findById(req.params.id).then(tutorial => {
-        console.log(tutorial);
         if (!tutorial) {
             return next(createError(404, "not found"))
         } else {
@@ -68,7 +67,6 @@ export const getSpecificTypeTutorials = async (req, res, next) => {
     try {
         const { type } = req.query
         const tutorials = await Tutorial.find({ type })
-        console.log("tutorials", tutorials);
         if (tutorials.length === 0) {
             res.status(200).json([])
         } else {
@@ -96,13 +94,44 @@ export const getRecommendTutorials = async (req, res, next) => {
         const userID = req.user.id
         const user = await User.findById(userID);
         const personalPrefer = user?.personalPrefer;
+        let fitTututorials;
+        if (personalPrefer && Object.keys(personalPrefer).length !== 0) {
 
-        if (!personalPrefer) {
+            const queryConditions = [];
+            // 当evaluationAnswer.goal存在时，添加type条件
+            if (personalPrefer?.goal) {
+                queryConditions.push({ type: { $eq: personalPrefer.goal } });
+            }
 
+            // 当evaluationAnswer.level存在时，添加level条件
+            if (personalPrefer?.level) {
+                queryConditions.push({ level: personalPrefer.level });
+            }
+
+            // 当evaluationAnswer.duration存在且其lowRangeValue和higherRangeValue存在时，添加duration条件
+            if (personalPrefer?.duration && Object.keys(personalPrefer?.duration).length !== 0 && typeof personalPrefer.duration.lowRangeValue !== 'undefined' && typeof personalPrefer.duration.higherRangeValue !== 'undefined') {
+                queryConditions.push({ duration: { $gte: personalPrefer.duration.lowRangeValue, $lte: personalPrefer.duration.higherRangeValue } });
+            }
+
+            // 当evaluationAnswer.calorie存在且其lowRangeValue和higherRangeValue存在时，添加calorie条件
+            if (personalPrefer?.calorie && Object.keys(personalPrefer?.calorie).length !== 0 && typeof personalPrefer.calorie.lowRangeValue !== 'undefined' && typeof personalPrefer.calorie.higherRangeValue !== 'undefined') {
+                const calorieRangeCondition = {
+                    $or: [
+                        { lowerEstimateColorie: { $gte: personalPrefer.calorie.lowRangeValue, $lte: personalPrefer.calorie.higherRangeValue } },
+                        { higherEstimateColorie: { $gte: personalPrefer.calorie.lowRangeValue, $lte: personalPrefer.calorie.higherRangeValue } },
+                    ]
+                };
+                queryConditions.push(calorieRangeCondition);
+            }
+
+            // 使用$and操作符，只有当queryConditions非空时才添加到查询中
+            const query = queryConditions.length > 0 ? { $and: queryConditions } : {};
+            fitTututorials = await Tutorial.find(query)
+            console.log(fitTututorials.length);
         } else {
-
+            fitTututorials = []
         }
-        res.status(200).json(tutorial)
+        res.status(200).json(fitTututorials)
     } catch (err) {
         next(err)
     }
