@@ -33,7 +33,6 @@ export const finishSession = async (req, res, next) => {
             date: { $gte: startOfToday, $lte: endOfToday },
             tutorial: tutorialID
         }).exec();
-        console.log(sessionsToday);
         let session;
         if (sessionsToday.length === 1) {
             const specificSession = sessionsToday[0]
@@ -75,9 +74,7 @@ export const deleteSession = async (req, res, next) => {
     try {
         const userID = req.user.id
         const sessionID = req.params.id
-        console.log("sessionID", sessionID);
         const session = await Session.findByIdAndDelete(sessionID)
-        console.log("session", session);
         const user = await User.findByIdAndUpdate(userID, { $pull: { sessions: session._id } });
         const updatedSessions = await Session.find({ user: userID }).populate('tutorial')
         if (!user) {
@@ -94,7 +91,6 @@ export const getSessions = async (req, res, next) => {
     try {
         const userID = req.user.id
         const userSessions = await Session.find({ user: userID }).populate('tutorial').lean()
-        console.log(userSessions);
         // const user = await User.findById(userID);
         // if (!user) {
         //     return next(createError(404, "not found"))

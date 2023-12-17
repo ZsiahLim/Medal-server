@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken'
 import User from '../models/Users.js'
 import Tutorial from '../models/Tutorial.js'
 import Blog from '../models/Blog.js'
+import Music from '../models/Music.js'
 import Report from '../models/Report.js'
 import Comment from '../models/Comment.js'
 import Notification from '../models/Notification.js'
@@ -20,11 +21,6 @@ export const signin = async (req, res, next) => {
             const token = jwt.sign({ id: admin._id }, process.env.JWT)
             const response = { token, admin: admin._doc }
             res.status(200).json(response)
-            // .set({
-            //     'Access-Control-Allow-Origin': 'http://localhost:5173',
-            //     "Content-Type": "application/json;charset=utf-8",
-            //     "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Access-Token",
-            // })
         }
         let isVerified = password === admin.password ? true : false
         const verifyProcess = async (isVerified) => {
@@ -68,17 +64,17 @@ export const getOverview = async (req, res, next) => {
         const usersPromise = User.find({}).lean()
         const tutorialsPromise = Tutorial.find({}).lean()
         const blogsPromise = Blog.find({}).lean()
-        const reportsPromise = Report.find({}).lean()
+        const reportsPromise = Report.find({ status: 'waiting' }).lean()
         const feedbacksPromise = Feedback.find({ status: 'waiting' }).lean()
-        const commentsPromise = Comment.find({ status: 'waiting' }).lean()
-        const [users, tutorials, blogs, reports, feedbacks, comments] = await Promise.all([usersPromise, tutorialsPromise, blogsPromise, reportsPromise, feedbacksPromise, commentsPromise])
+        const musicsPromise = Music.find({}).lean()
+        const [users, tutorials, blogs, reports, feedbacks, musics] = await Promise.all([usersPromise, tutorialsPromise, blogsPromise, reportsPromise, feedbacksPromise, musicsPromise])
         const overview = {
             usersNum: users.length,
             tutorialsNum: tutorials.length,
             blogsNum: blogs.length,
             reportsNum: reports.length,
             feedbacksNum: feedbacks.length,
-            commentsNum: comments.length,
+            musicsNum: musics.length,
         }
         res.status(200).json(overview)
     } catch (err) {
@@ -139,6 +135,19 @@ export const reply = async (req, res, next) => {
         await Report.findByIdAndUpdate(report._id, { status: 'done', adminResponse: `Reply to reporter: ${content}` })
         const NotificationForReporter = new Notification({ userID: report.userID, type: 'reportfeedback', title: `${content}`, targetID: report.targetID, targetType: report.type })
         await NotificationForReporter.save()
+        res.status(200).json({ success: true })
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const replyFeedback = async (req, res, next) => {
+    try {
+        const targetID = req.params.id
+        const { content, feedback } = req.body
+        await Feedback.findByIdAndUpdate(feedback._id, { status: 'done', adminResponse: `Reply to reporter: ${content}` })
+        const notifiFeedback = new Notification({ userID: feedback.userID, type: 'feedbackFeedback', title: `${content}` })
+        await notifiFeedback.save()
         res.status(200).json({ success: true })
     } catch (err) {
         next(err)

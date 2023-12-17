@@ -33,18 +33,14 @@ router.put('/like/:blogID', verifyToken, likeBlog)
 router.put('/cancellike/:blogID', verifyToken, cancerlikeBlog)
 
 // favorite the blog
-// router.put('/favorite/:blogID', favoriteBlog)
 router.put('/favorite/:blogID', verifyToken, favoriteBlog)
 
-// cancel favorite the blog
 router.put('/cancelfavorite/:blogID', verifyToken, cancerfavoriteBlog)
 
 // dislike the blog
-// router.put('/dislike/:blogID', dislikeBlog)
 router.put('/dislike/:blogID', verifyToken, dislikeBlog)
 
 // like the comment
-// router.put('/like/:blogID', likeBlog)q`1fftxtr65
 router.put('/likecomment/:commentID', verifyToken, likeComment)
 
 router.put('/cancellikecomment/:commentID', verifyToken, cancerlikeComment)
