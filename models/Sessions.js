@@ -7,7 +7,10 @@ const SessionSchema = new Schema({
     tutorial: {
         type: Schema.Types.ObjectId,
         ref: 'tutorials',
-        required: true,
+    },
+    otherTypeTutorial: {
+        type: Object,
+        default: {},
     },
     completed: {
         type: Boolean,
@@ -32,6 +35,9 @@ const SessionSchema = new Schema({
         type: Number,
     },
     step: {
+        type: Number,
+    },
+    distance: {
         type: Number,
     }
 }, { timestamps: true })
