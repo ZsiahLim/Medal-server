@@ -18,7 +18,32 @@ export const createSession = async (req, res, next) => {
         next(err)
     }
 }
-
+export const finishSessionOutside = async (req, res, next) => {
+    try {
+        const userID = req.user.id
+        const { tutorial, data, date } = req.body
+        const startOfToday = new Date();
+        startOfToday.setHours(0, 0, 0, 0);
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+        let session;
+        const newSession = new Session(
+            {
+                user: userID,
+                date: new Date(date),
+                completed: true,
+                otherTypeTutorial: tutorial,
+                ...data
+            }
+        )
+        session = await newSession.save();
+        const user = await User.findByIdAndUpdate(userID, { $push: { sessions: session._id } });
+        const updatedSessions = await Session.find({ user: userID })
+        res.status(200).json({ user, updatedSessions })
+    } catch (err) {
+        next(err)
+    }
+}
 export const finishSession = async (req, res, next) => {
     try {
         const userID = req.user.id
