@@ -63,7 +63,7 @@ export const finishSession = async (req, res, next) => {
         if (sessionsToday.length > 1) {
             const specificSession = sessionsToday.find(session => session.completed === false);
             console.log("specificSession", specificSession);
-            if (specificSession.completed === true) {
+            if (!specificSession) {
                 const newSession = new Session(
                     {
                         user: userID,
