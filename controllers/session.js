@@ -59,8 +59,10 @@ export const finishSession = async (req, res, next) => {
             tutorial: tutorialID
         }).exec();
         let session;
-        if (sessionsToday.length === 1) {
-            const specificSession = sessionsToday[0]
+        console.log("sessionsToday", sessionsToday);
+        if (sessionsToday.length > 1) {
+            const specificSession = sessionsToday.find(session => session.completed === false);
+            console.log("specificSession", specificSession);
             if (specificSession.completed === true) {
                 const newSession = new Session(
                     {
