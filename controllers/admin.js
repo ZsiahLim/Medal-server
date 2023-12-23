@@ -9,6 +9,7 @@ import Music from '../models/Music.js'
 import Report from '../models/Report.js'
 import Comment from '../models/Comment.js'
 import Notification from '../models/Notification.js'
+import { formatTimeToChinese } from '../utils/timeFuncs.js'
 
 export const signin = async (req, res, next) => {
     try {
@@ -171,9 +172,9 @@ export const operateUser = async (req, res, next) => {
         } else {
             await User.findByIdAndUpdate(userID, { status: operationType })
         }
-        await Report.findByIdAndUpdate(reportID, { status: 'done', adminResponse: `already ${operationType} your report user` })
-        const NotificationForReporter = new Notification({ userID: reporterID, type: 'reportfeedback', title: `the account u report has been ${operationType}, tq`, targetID: userID, targetType: 'user' })
-        const NotificationForReportedUser = new Notification({ userID, type: 'reportedfeedback', title: `ur account has been ${operationType}` })
+        await Report.findByIdAndUpdate(reportID, { status: 'done', adminResponse: `Already ${operationType} reported user` })
+        const NotificationForReporter = new Notification({ userID: reporterID, type: 'reportfeedback', title: `We already ${operationType} the user you report, Thanks for your feedback!`, targetID: userID, targetType: 'user' })
+        const NotificationForReportedUser = new Notification({ userID: userID, type: 'reportedfeedback', title: `Your account status has already change to 「${operationType}」, due to you are not follow the rule of community. ${req.body?.muteDate ? (", You will not be muted after " + formatTimeToChinese(req.body?.muteDate)) : ""}` })
         await NotificationForReporter.save()
         await NotificationForReportedUser.save()
         res.status(200).json({ success: true })
