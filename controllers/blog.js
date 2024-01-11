@@ -59,7 +59,23 @@ export const random = async (req, res, next) => {
 
 export const mostLike = async (req, res, next) => {
     try {
-        const blogs = await Blog.find().sort({ likeNum: -1 }).limit(20)
+        const blogs = await Blog.aggregate([
+            // 添加一个字段来表示 likesUsers 数组的长度
+            { $addFields: { likesCount: { $size: "$likesUsers" } } },
+            // 根据 likesCount 字段进行排序
+            { $sort: { likesCount: -1 } },
+            // 限制结果数量
+            { $limit: 20 }
+        ]);
+        res.status(200).json(blogs)
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const latest = async (req, res, next) => {
+    try {
+        const blogs = await Blog.find().sort({ createdAt: -1 }).limit(20)
         res.status(200).json(blogs)
     } catch (err) {
         next(err)
@@ -121,6 +137,24 @@ export const getMyfavorBlogs = async (req, res, next) => {
         const user = await User.findById(req.user.id)
         const userfavorBlogs = await Blog.find({ _id: { $in: user.favoriteBlogs }, deleted: false })
         res.status(200).json(userfavorBlogs)
+    } catch (err) {
+        next(err)
+    }
+}
+
+export const getSubscribedUsersBlogs = async (req, res, next) => {
+    try {
+        const contacts = await User.findById(req.user.id)
+            .populate({
+                path: 'contactsUsers',
+                model: 'users', // assuming 'users' is the model name for your user schema
+                populate: {
+                    path: 'blogs',
+                    model: 'blogs' // assuming 'blogs' is the model name for your blog schema
+                }
+            });
+        let subscribedUsersBlogs = contacts.contactsUsers.map(user => user.blogs).flat();
+        res.status(200).json(subscribedUsersBlogs)
     } catch (err) {
         next(err)
     }
