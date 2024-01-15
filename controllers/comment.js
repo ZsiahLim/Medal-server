@@ -36,3 +36,11 @@ export const getComments = async (req, res, next) => {
         next(err)
     }
 }
+export const getCommentById = async (req, res, next) => {
+    try {
+        const comments = await Comment.findById(req.params.id)
+        res.status(200).json(comments)
+    } catch (err) {
+        next(err)
+    }
+}

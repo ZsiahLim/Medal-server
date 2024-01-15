@@ -46,6 +46,16 @@ export const getRecords = async (req, res, next) => {
     }
 }
 
+export const getRecordsByUserId = async (req, res, next) => {
+    try {
+        const userID = req.params.id
+        const records = await Record.find({ user: userID }).sort({ date: 1 })
+        res.status(200).json(records)
+    } catch (err) {
+        next(err)
+    }
+}
+
 export const getLatestRecord = async (req, res, next) => {
     try {
         const userID = req.user.id
